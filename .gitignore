@@ -1,1 +1,8 @@
+# venv
 .env/
+env/
+.venv/
+venv/
+
+# Test directory
+test/
