@@ -153,7 +153,7 @@ class Map:
     # - sort une solution dans un txt ouput(self) -> None
     def __init__(self, in_file: str) -> None:
         with open(in_file, mode="r", encoding="utf-8") as file:
-            lines = file.readlines()
+            lines = [ line.strip() for line in file.readlines()]
 
         width, height, n_golden_points, n_silver_points, n_tile_types = lines[0].split(
             " "
@@ -181,10 +181,14 @@ class Map:
                 + self.n_silver_points
             ]
         ]
-        self.tiles = [
+        tiles = [
             Tile(line.split(" ")[0], int(line.split(" ")[1]), int(line.split(" ")[2]))
             for line in lines[1 + self.n_golden_points + self.n_silver_points :]
         ]
+        self.kind_to_tile = {
+            tile.kind: tile
+            for tile in tiles
+        }
 
     def tile_dict(self) -> dict[str, Tile]:
         return {tile.kind: tile for tile in self.tiles}
