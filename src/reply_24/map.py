@@ -1,6 +1,127 @@
 from typing import NamedTuple
 
 
+# Tile 3:
+# From left to right (*)
+# Tile 5:
+# From down to right (*)
+# Tile 6:
+# From left to down (*)
+# Tile 7:
+# • From left to right (*)
+# • From left to down (*)
+# • From down to right (*)
+# Tile 9:
+# From up to right (*)
+# Tile 96:
+# • From left to down (*)
+# • From up to right (*)
+# Tile A:
+# From left to up (*)
+# Tile A5:
+# • From left to up (*)
+# • From down to right (*)
+# Tile B:
+# • From left to right (*)
+# • From left to up (*)
+# • From up to right (*)
+# Tile C:
+# From up to down (*)
+# Tile C3:
+# • From left to right (*)
+# • From up to down (*)
+# Tile D:
+# • From up to down (*)
+# • From up to right (*)
+# • From down to right (*)
+# Tile E:
+# • From left to up (*)
+# • From left to down (*)
+# • From up to down (*)
+# Tile F:
+# • From left to right (*)
+# • From left to down (*)
+# • From left to up (*)
+# • From up to down (*)
+# • From down to right (*)
+# • From up to right (*)
+# TILE_KIND_TO_DIR = {
+#     "3": [((-1, 0), (1, 0))],
+#     "5": [((0, 1), (1, 0))],
+#     "6": [((-1, 0), (0, 1))],
+#     "7": [((-1, 0), (1, 0)), ((-1, 0), (0, 1)), ((0, 1), (1, 0))],
+#     "9": [((0, -1), (1, 0))],
+#     "96": [((-1, 0), (0, 1)), ((0, -1), (1, 0))],
+#     "A": [((-1, 0), (0, -1))],
+#     "A5": [((-1, 0), (0, -1)), ((0, 1), (1, 0))],
+#     "B": [((-1, 0), (1, 0)), ((-1, 0), (0, -1)), ((0, -1), (1, 0))],
+#     "C": [((0, -1), (0, 1))],
+#     "C3": [((-1, 0), (1, 0)), ((0, -1), (0, 1))],
+#     "D": [((0, -1), (0, 1)), ((0, -1), (1, 0)), ((0, 1), (1, 0))],
+#     "E": [((-1, 0), (0, -1)), ((-1, 0), (0, 1)), ((0, -1), (0, 1))],
+#     "F": [
+#         ((-1, 0), (1, 0)),
+#         ((-1, 0), (0, 1)),
+#         ((-1, 0), (0, -1)),
+#         ((0, -1), (0, 1)),
+#         ((0, 1), (1, 0)),
+#         ((0, -1), (1, 0)),
+#     ],
+# }
+
+
+class Direction(NamedTuple):
+    x: int
+    y: int
+
+
+TILE_KIND_TO_DIR = {
+    "3": [(Direction(-1, 0), Direction(1, 0))],
+    "5": [(Direction(0, 1), Direction(1, 0))],
+    "6": [(Direction(-1, 0), Direction(0, 1))],
+    "7": [
+        (Direction(-1, 0), Direction(1, 0)),
+        (Direction(-1, 0), Direction(0, 1)),
+        (Direction(0, 1), Direction(1, 0)),
+    ],
+    "9": [(Direction(0, -1), Direction(1, 0))],
+    "96": [(Direction(-1, 0), Direction(0, 1)), (Direction(0, -1), Direction(1, 0))],
+    "A": [(Direction(-1, 0), Direction(0, -1))],
+    "A5": [(Direction(-1, 0), Direction(0, -1)), (Direction(0, 1), Direction(1, 0))],
+    "B": [
+        (Direction(-1, 0), Direction(1, 0)),
+        (Direction(-1, 0), Direction(0, -1)),
+        (Direction(0, -1), Direction(1, 0)),
+    ],
+    "C": [(Direction(0, -1), Direction(0, 1))],
+    "C3": [(Direction(-1, 0), Direction(1, 0)), (Direction(0, -1), Direction(0, 1))],
+    "D": [
+        (Direction(0, -1), Direction(0, 1)),
+        (Direction(0, -1), Direction(1, 0)),
+        (Direction(0, 1), Direction(1, 0)),
+    ],
+    "E": [
+        (Direction(-1, 0), Direction(0, -1)),
+        (Direction(-1, 0), Direction(0, 1)),
+        (Direction(0, -1), Direction(0, 1)),
+    ],
+    "F": [
+        (Direction(-1, 0), Direction(1, 0)),
+        (Direction(-1, 0), Direction(0, 1)),
+        (Direction(-1, 0), Direction(0, -1)),
+        (Direction(0, -1), Direction(0, 1)),
+        (Direction(0, 1), Direction(1, 0)),
+        (Direction(0, -1), Direction(1, 0)),
+    ],
+    "Golden": [
+        (Direction(0, 0), Direction(0, 1)),
+        (Direction(0, 0), Direction(1, 0)),
+        (Direction(0, 0), Direction(0, -1)),
+        (Direction(0, 0), Direction(-1, 0)),
+    ]
+}
+
+
 class GoldenPoint(NamedTuple):
     x: int
     y: int
@@ -62,11 +183,7 @@ class Map:
         ]
         self.tiles = [
             Tile(line.split(" ")[0], int(line.split(" ")[1]), int(line.split(" ")[2]))
-            for line in lines[
-                 1
-                + self.n_golden_points
-                + self.n_silver_points:
-            ]
+            for line in lines[1 + self.n_golden_points + self.n_silver_points :]
         ]
 
     def tile_dict(self) -> dict[str, Tile]:
@@ -75,4 +192,3 @@ class Map:
     def output(self) -> None: ...
 
     ...
-
