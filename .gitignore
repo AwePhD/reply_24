@@ -6,3 +6,6 @@ venv/
 
 # Test directory
 test/
+
+# pycache
+src/reply_24/__pycache__/
