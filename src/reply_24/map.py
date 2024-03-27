@@ -113,18 +113,21 @@ TILE_KIND_TO_DIR = {
         (Direction(0, 1), Direction(1, 0)),
         (Direction(0, -1), Direction(1, 0)),
     ],
-    "Golden": [
-        (Direction(0, 0), Direction(0, 1)),
-        (Direction(0, 0), Direction(1, 0)),
-        (Direction(0, 0), Direction(0, -1)),
-        (Direction(0, 0), Direction(-1, 0)),
-    ]
+    # "Golden": [
+    #     (Direction(0, 0), Direction(0, 1)),
+    #     (Direction(0, 0), Direction(1, 0)),
+    #     (Direction(0, 0), Direction(0, -1)),
+    #     (Direction(0, 0), Direction(-1, 0)),
+    # ]
 }
 
 
 class GoldenPoint(NamedTuple):
     x: int
     y: int
+
+    def copy(self):
+        return GoldenPoint(self.x, self.y)
 
 
 class SilverPoint(NamedTuple):
@@ -143,6 +146,12 @@ class SetTile(NamedTuple):
     tile: Tile
     x: int
     y: int
+
+    def copy(self):
+        return SetTile(self.tile, self.x, self.y)
+
+    def __str__(self) -> str:
+        return f"{self.tile.kind}   ({self.x}, {self.y})"
 
 
 class Map:
@@ -190,8 +199,8 @@ class Map:
             for tile in tiles
         }
 
-    def tile_dict(self) -> dict[str, Tile]:
-        return {tile.kind: tile for tile in self.tiles}
+    # def tile_dict(self) -> dict[str, Tile]:
+    #     return {tile.kind: tile for tile in self.tiles}
 
     def output(self) -> None: ...
 

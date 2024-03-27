@@ -1,4 +1,4 @@
-from reply_24.map import Map, Direction
+from reply_24.map import Map, Direction, SetTile, Tile
 from reply_24.score import parse_output, explore_adjacent_tiles, follow_path
 from reply_24.solver import Solver
 
@@ -22,10 +22,12 @@ def main():
     map_03 = Map("03-adventure.txt")
     map_04 = Map("04-drama.txt")
     map_05 = Map("05-horror.txt")
-    example_result = parse_output("example_output.txt", map_00)
-    print(explore_adjacent_tiles(example_result[0], map_00, Direction(-1, 0), example_result))
-    print(follow_path(example_result, map_00))
-
+    map_example = Map("example_input.txt")
+    example_result = parse_output("example_output.txt", map_example)
+    print(SetTile(Tile('F', 2, 1), 2, 2) == SetTile(Tile('F', 2, 1), 2, 2))
+    print(explore_adjacent_tiles(example_result[2], map_example, Direction(0, 1), example_result))
+    for k, v in follow_path(example_result, map_example).items():
+        print(k, v)
     
 if __name__ == "__main__":
     main()
