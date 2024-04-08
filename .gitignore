@@ -9,3 +9,6 @@ test/
 
 # pycache
 src/reply_24/__pycache__/
+src/reply_24/__pycache__/__init__.cpython-311.pyc
+src/reply_24/__pycache__/__init__.cpython-311.pyc
+src/reply_24/__pycache__/solver.cpython-311.pyc

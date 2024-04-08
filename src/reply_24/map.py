@@ -1,81 +1,17 @@
 from typing import NamedTuple
 
 
-# Tile 3:
-# From left to right (*)
-# Tile 5:
-# From down to right (*)
-# Tile 6:
-# From left to down (*)
-# Tile 7:
-# • From left to right (*)
-# • From left to down (*)
-# • From down to right (*)
-# Tile 9:
-# From up to right (*)
-# Tile 96:
-# • From left to down (*)
-# • From up to right (*)
-# Tile A:
-# From left to up (*)
-# Tile A5:
-# • From left to up (*)
-# • From down to right (*)
-# Tile B:
-# • From left to right (*)
-# • From left to up (*)
-# • From up to right (*)
-# Tile C:
-# From up to down (*)
-# Tile C3:
-# • From left to right (*)
-# • From up to down (*)
-# Tile D:
-# • From up to down (*)
-# • From up to right (*)
-# • From down to right (*)
-# Tile E:
-# • From left to up (*)
-# • From left to down (*)
-# • From up to down (*)
-# Tile F:
-# • From left to right (*)
-# • From left to down (*)
-# • From left to up (*)
-# • From up to down (*)
-# • From down to right (*)
-# • From up to right (*)
-# TILE_KIND_TO_DIR = {
-#     "3": [((-1, 0), (1, 0))],
-#     "5": [((0, 1), (1, 0))],
-#     "6": [((-1, 0), (0, 1))],
-#     "7": [((-1, 0), (1, 0)), ((-1, 0), (0, 1)), ((0, 1), (1, 0))],
-#     "9": [((0, -1), (1, 0))],
-#     "96": [((-1, 0), (0, 1)), ((0, -1), (1, 0))],
-#     "A": [((-1, 0), (0, -1))],
-#     "A5": [((-1, 0), (0, -1)), ((0, 1), (1, 0))],
-#     "B": [((-1, 0), (1, 0)), ((-1, 0), (0, -1)), ((0, -1), (1, 0))],
-#     "C": [((0, -1), (0, 1))],
-#     "C3": [((-1, 0), (1, 0)), ((0, -1), (0, 1))],
-#     "D": [((0, -1), (0, 1)), ((0, -1), (1, 0)), ((0, 1), (1, 0))],
-#     "E": [((-1, 0), (0, -1)), ((-1, 0), (0, 1)), ((0, -1), (0, 1))],
-#     "F": [
-#         ((-1, 0), (1, 0)),
-#         ((-1, 0), (0, 1)),
-#         ((-1, 0), (0, -1)),
-#         ((0, -1), (0, 1)),
-#         ((0, 1), (1, 0)),
-#         ((0, -1), (1, 0)),
-#     ],
-# }
-
-
-class Direction(NamedTuple):
+class Coordinate(NamedTuple):
     x: int
     y: int
 
 
-TILE_KIND_TO_DIR = {
+class Direction(NamedTuple):
+    dx: int
+    dy: int
+
+
+TILE_KIND_TO_DIR: dict[str, list[tuple[Direction, Direction]]] = {
     "3": [(Direction(-1, 0), Direction(1, 0))],
     "5": [(Direction(0, 1), Direction(1, 0))],
     "6": [(Direction(-1, 0), Direction(0, 1))],
@@ -113,14 +49,36 @@ TILE_KIND_TO_DIR = {
         (Direction(0, 1), Direction(1, 0)),
         (Direction(0, -1), Direction(1, 0)),
     ],
-    # "Golden": [
-    #     (Direction(0, 0), Direction(0, 1)),
-    #     (Direction(0, 0), Direction(1, 0)),
-    #     (Direction(0, 0), Direction(0, -1)),
-    #     (Direction(0, 0), Direction(-1, 0)),
-    # ]
 }
 
+TILE_KIND_TO_CHAR = {
+    "3": "\u2500",
+    "5": "\u256d",
+    "6": "\u256e",
+    "7": "\u252c",
+    "9": "\u2570",
+    # "96": "\u2534",
+    "A": "\u256f",
+    # "A5": "\u251c",
+    "B": "\u2534",
+    "C": "\u2502",
+    # "C3": "\u2551",
+    "D": "\u251c",
+    "E": "\u2524",
+    "F": "\u253c",
+
+}
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 class GoldenPoint(NamedTuple):
     x: int
@@ -137,9 +95,9 @@ class SilverPoint(NamedTuple):
 
 
 class Tile(NamedTuple):
-    kind: str
     cost: int
-    count: int
+    quantity: int
+    kind: str
 
 
 class SetTile(NamedTuple):
@@ -162,7 +120,7 @@ class Map:
     # - sort une solution dans un txt ouput(self) -> None
     def __init__(self, in_file: str) -> None:
         with open(in_file, mode="r", encoding="utf-8") as file:
-            lines = [ line.strip() for line in file.readlines()]
+            lines = [line.strip() for line in file.readlines()]
 
         width, height, n_golden_points, n_silver_points, n_tile_types = lines[0].split(
             " "
@@ -191,17 +149,81 @@ class Map:
             ]
         ]
         tiles = [
-            Tile(line.split(" ")[0], int(line.split(" ")[1]), int(line.split(" ")[2]))
+            Tile(
+                kind=line.split(" ")[0],
+                cost=int(line.split(" ")[1]),
+                quantity=int(line.split(" ")[2]),
+            )
             for line in lines[1 + self.n_golden_points + self.n_silver_points :]
         ]
-        self.kind_to_tile = {
-            tile.kind: tile
-            for tile in tiles
-        }
+        self.kind_to_tile = {tile.kind: tile for tile in tiles}
 
     # def tile_dict(self) -> dict[str, Tile]:
     #     return {tile.kind: tile for tile in self.tiles}
 
+    def _get_char_of_coord(self, x: int, y: int, set_tiles: list[SetTile]):
+        for gold in self.golden_points:
+            if x == gold.x and y == gold.y:
+                return "G"
+        for silv in self.silver_points:
+            if x == silv.x and y == silv.y:
+                return "S"
+        for tile in set_tiles:
+            if x == tile.x and y == tile.y:
+                return TILE_KIND_TO_CHAR[tile.tile.kind]
+            
+        return "."
+
+    def print(self, set_tiles: list[SetTile]):
+        output = []
+        for y in range(self.height):
+            for x in range(self.width):
+                output.append(self._get_char_of_coord(x, y, set_tiles))
+            output.append('\n')
+        print("".join(output))
+
+
     def output(self) -> None: ...
 
     ...
+
+
+class Node(NamedTuple):
+    coordinate: Coordinate
+    direction: Direction | None
+
+    @staticmethod
+    def from_tile(tile: SetTile, direction: Direction | None = None):
+        return Node(coordinate=Coordinate(x=tile.x, y=tile.y), direction=direction)
+
+    def get_tile(self, map: Map, result: list[SetTile]) -> SetTile | GoldenPoint | None:
+        for golden in map.golden_points:
+            if golden.x == self.coordinate.x and golden.y == self.coordinate.y:
+                return golden
+        for tile in result:
+            if tile.x == self.coordinate.x and tile.y == self.coordinate.y:
+                return tile
+        return None
+
+
+class PathCost(NamedTuple):
+    cost: int
+    earning: int
+
+    @staticmethod
+    def from_node(node: Node, map: Map, result: list[SetTile]) -> "PathCost":
+        earning: int = 0
+        for silver_point in map.silver_points:
+            if (
+                silver_point.x == node.coordinate.x
+                and silver_point.y == node.coordinate.y
+            ):
+                earning = silver_point.score
+        tile_or_none = node.get_tile(map, result)
+        if tile_or_none is None or isinstance(tile_or_none, GoldenPoint):
+            return PathCost(0, 0)
+        else:
+            return PathCost(cost=tile_or_none.tile.cost, earning=earning)
+
+    def __add__(self, other: tuple):
+        return PathCost(self.cost + other[0], self.earning + other[1])

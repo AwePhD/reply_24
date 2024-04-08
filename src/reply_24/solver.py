@@ -58,7 +58,7 @@ class Solver:
             kind = choice(tile_kind)
 
             tile = self.map.kind_to_tile[kind]
-            self.map.kind_to_tile[kind] = Tile(tile.kind, tile.cost, tile.count-1)
+            self.map.kind_to_tile[kind] = Tile(tile.kind, tile.cost, tile.quantity-1)
 
 
 

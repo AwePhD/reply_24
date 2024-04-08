@@ -1,7 +1,8 @@
-from reply_24.map import Map, Direction, SetTile, Tile
-from reply_24.score import parse_output, explore_adjacent_tiles, follow_path
+import math
+from reply_24.map import Map, Direction, Node, SetTile, Tile
+from reply_24.score import calculate_score, find_path_dijkstra, get_neighbours, parse_output
 from reply_24.solver import Solver
-
+import time
 
 def main():
     file_names = [
@@ -12,8 +13,9 @@ def main():
         "04-drama.txt",
         "05-horror.txt",
     ]
-    solver = Solver(Map(file_names[5]))
-    solver.solve()
+    # solver = Solver(Map(file_names[5]))
+    # solver.solve()
+    # print(Tile('kind', 5, 6) == ('kind', 5, 6))  # True
 
 
     map_00 = Map("00-trailer.txt")
@@ -24,10 +26,16 @@ def main():
     map_05 = Map("05-horror.txt")
     map_example = Map("example_input.txt")
     example_result = parse_output("example_output.txt", map_example)
-    print(SetTile(Tile('F', 2, 1), 2, 2) == SetTile(Tile('F', 2, 1), 2, 2))
-    print(explore_adjacent_tiles(example_result[2], map_example, Direction(0, 1), example_result))
-    for k, v in follow_path(example_result, map_example).items():
-        print(k, v)
+    map_example.print(example_result)
+    start_time = time.perf_counter()
+    print("Score =", calculate_score(example_result, map_example))
     
+    stop_time = time.perf_counter()
+    execution_time = stop_time - start_time
+    units = {0: 's', -3: 'ms', -6: 'µs', -9: 'ns'}
+    execution_time_power_of_ten = int(math.log10(execution_time))
+    execution_time_power_of_ten -= execution_time_power_of_ten % 3
+    execution_time = execution_time * 10**(-execution_time_power_of_ten)
+    print(f"[Done] Execution time: {execution_time:.2f} {units[execution_time_power_of_ten]}")
 if __name__ == "__main__":
     main()
